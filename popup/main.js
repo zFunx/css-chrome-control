@@ -11,7 +11,6 @@ const dom = {
   editorTitle: document.getElementById('editor-title'),
   nameInput: document.getElementById('snippet-name'),
   codeInput: document.getElementById('snippet-code'),
-  highlightingContent: document.getElementById('highlighting-content'),
   charCount: document.getElementById('char-count'),
   btnSave: document.getElementById('btn-save'),
   btnCancel: document.getElementById('btn-cancel'),
@@ -172,23 +171,65 @@ function handleDragEnd() {
   document.querySelectorAll('.snippet-item').forEach(el => el.classList.remove('dragging'));
 }
 
-// Editor
+// Editor setup
+let cmEditor = null;
+
+function initCodeMirror() {
+  if (!cmEditor) {
+    cmEditor = CodeMirror.fromTextArea(dom.codeInput, {
+      mode: "css",
+      theme: "material-darker",
+      lineNumbers: false,
+      lineWrapping: true,
+      extraKeys: {"Ctrl-Space": "autocomplete"}
+    });
+
+    cmEditor.on("inputRead", function(cm, change) {
+      if (!cm.state.completionActive && /[a-zA-Z-]/.test(change.text[0])) {
+        CodeMirror.commands.autocomplete(cm, null, {completeSingle: false});
+      }
+    });
+
+    cmEditor.on("beforeChange", function(cm, change) {
+      if (change.origin === "paste" || change.origin === "+input") {
+        const newText = change.text.join("\n");
+        const currentLen = cm.getValue().length;
+        const replaceLen = change.removed ? change.removed.join("\n").length : 0;
+        
+        if (currentLen - replaceLen + newText.length > 500) {
+          const allowedLen = 500 - (currentLen - replaceLen);
+          if (allowedLen > 0) {
+            change.update(change.from, change.to, newText.substring(0, allowedLen).split("\n"));
+          } else {
+            change.cancel();
+          }
+        }
+      }
+    });
+    
+    cmEditor.on("change", updateCharCount);
+  }
+}
+
 function openEditor(id = null) {
   editingId = id;
   dom.editor.classList.remove('hidden');
   dom.btnAdd.style.display = 'none';
   
+  if (!cmEditor) initCodeMirror();
+  
   if (id) {
     const snippet = snippets.find(s => s.id === id);
     dom.editorTitle.textContent = 'Edit Snippet';
     dom.nameInput.value = snippet.name;
-    dom.codeInput.value = snippet.content;
+    cmEditor.setValue(snippet.content || '');
   } else {
     dom.editorTitle.textContent = 'New Snippet';
     dom.nameInput.value = '';
-    dom.codeInput.value = '';
+    cmEditor.setValue('');
   }
-  syncPrism();
+  
+  setTimeout(() => cmEditor.refresh(), 10);
   updateCharCount();
 }
 
@@ -199,7 +240,7 @@ function closeEditor() {
 }
 
 function updateCharCount() {
-  const len = dom.codeInput.value.length;
+  const len = cmEditor ? cmEditor.getValue().length : 0;
   dom.charCount.textContent = `${len} / 500`;
   if (len >= 500) {
     dom.charCount.style.color = 'var(--danger)';
@@ -212,42 +253,9 @@ function updateCharCount() {
 dom.btnAdd.addEventListener('click', () => openEditor());
 dom.btnCancel.addEventListener('click', closeEditor);
 
-// Editor Sync and Indentation
-function syncPrism() {
-  const text = dom.codeInput.value;
-  if (window.Prism) {
-    dom.highlightingContent.innerHTML = Prism.highlight(text, Prism.languages.css, 'css');
-  } else {
-    dom.highlightingContent.textContent = text;
-  }
-}
-
-dom.codeInput.addEventListener('input', () => {
-  updateCharCount();
-  syncPrism();
-});
-
-dom.codeInput.addEventListener('scroll', () => {
-  const pre = dom.codeInput.nextElementSibling;
-  pre.scrollTop = dom.codeInput.scrollTop;
-  pre.scrollLeft = dom.codeInput.scrollLeft;
-});
-
-dom.codeInput.addEventListener('keydown', function(e) {
-  if (e.key === 'Tab') {
-    e.preventDefault();
-    const start = this.selectionStart;
-    const end = this.selectionEnd;
-    this.value = this.value.substring(0, start) + '  ' + this.value.substring(end);
-    this.selectionStart = this.selectionEnd = start + 2;
-    updateCharCount();
-    syncPrism();
-  }
-});
-
 dom.btnSave.addEventListener('click', async () => {
   const name = dom.nameInput.value.trim() || 'Untitled';
-  const content = dom.codeInput.value.trim();
+  const content = cmEditor ? cmEditor.getValue().trim() : '';
   
   if (!content) {
     alert("CSS content cannot be empty.");

@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CSS Chrome Control</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="libs/prism-tomorrow.min.css">
+  <link rel="stylesheet" href="libs/codemirror.min.css">
+  <link rel="stylesheet" href="libs/material-darker.min.css">
+  <link rel="stylesheet" href="libs/show-hint.min.css">
 </head>
 <body>
   <header>
@@ -27,8 +29,7 @@
       <h3 id="editor-title">New Snippet</h3>
       <input type="text" id="snippet-name" placeholder="Snippet Name (e.g. Dark Mode)" maxlength="50">
       <div class="editor-wrapper">
-        <textarea id="snippet-code" placeholder="body { background: #000 !important; }" spellcheck="false" maxlength="500"></textarea>
-        <pre aria-hidden="true"><code class="language-css" id="highlighting-content"></code></pre>
+        <textarea id="snippet-code" placeholder="body { background: #000 !important; }"></textarea>
         <div class="char-count" id="char-count">0 / 500</div>
       </div>
       <div class="editor-actions">
@@ -47,8 +48,10 @@
     </div>
   </footer>
 
-  <script src="libs/prism.min.js"></script>
-  <script src="libs/prism-css.min.js"></script>
+  <script src="libs/codemirror.min.js"></script>
+  <script src="libs/css.min.js"></script>
+  <script src="libs/show-hint.min.js"></script>
+  <script src="libs/css-hint.min.js"></script>
   <script src="main.js"></script>
 </body>
 </html>
