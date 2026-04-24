@@ -270,6 +270,8 @@ function triggerAutoSave() {
     const content = cmEditor ? cmEditor.getValue() : '';
     
     let snippet = snippets.find(s => s.id === editingId);
+    let justCreated = false;
+    
     if (!snippet) {
       if (!content.trim() && name === 'Untitled') return; // skip if completely empty
       
@@ -282,13 +284,21 @@ function triggerAutoSave() {
       };
       snippets.push(snippet);
       isNewSnippet = false;
+      justCreated = true;
     } else {
       snippet.name = name;
       snippet.content = content;
     }
     
     await saveSnippets();
-    render();
+    
+    if (justCreated) {
+      render();
+      if (cmEditor) cmEditor.focus();
+    } else {
+      const nameEl = document.querySelector(`.snippet-item[data-id="${editingId}"] .snippet-name`);
+      if (nameEl) nameEl.textContent = name;
+    }
   }, 300);
 }
 
