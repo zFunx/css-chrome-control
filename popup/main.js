@@ -71,6 +71,7 @@ function applyToTab() {
 
 // Render
 function render() {
+  document.body.appendChild(dom.editor); // Park editor safely before clearing list
   dom.list.innerHTML = '';
   
   if (snippets.length === 0) {
@@ -80,6 +81,7 @@ function render() {
     snippets.sort((a, b) => a.order - b.order).forEach((snippet, index) => {
       const el = document.createElement('div');
       el.className = 'snippet-item';
+      if (snippet.id === editingId) el.classList.add('active');
       el.draggable = true;
       el.dataset.id = snippet.id;
       
@@ -124,7 +126,14 @@ function render() {
       el.addEventListener('dragend', handleDragEnd);
 
       dom.list.appendChild(el);
+      if (snippet.id === editingId) {
+        dom.list.appendChild(dom.editor);
+      }
     });
+  }
+  
+  if (isNewSnippet && editingId) {
+    dom.list.appendChild(dom.editor);
   }
 }
 
@@ -212,6 +221,8 @@ function openEditor(id = null) {
   dom.editor.classList.remove('hidden');
   dom.btnAdd.style.display = 'none';
   
+  document.querySelectorAll('.snippet-item').forEach(el => el.classList.remove('active'));
+  
   if (!cmEditor) initCodeMirror();
   
   if (id) {
@@ -221,12 +232,19 @@ function openEditor(id = null) {
     dom.editorTitle.textContent = 'Edit Snippet';
     dom.nameInput.value = snippet.name;
     cmEditor.setValue(snippet.content || '');
+    
+    const el = document.querySelector(`.snippet-item[data-id="${id}"]`);
+    if (el) {
+      el.classList.add('active');
+      el.after(dom.editor);
+    }
   } else {
     editingId = Date.now().toString();
     isNewSnippet = true;
     dom.editorTitle.textContent = 'New Snippet';
     dom.nameInput.value = '';
     cmEditor.setValue('');
+    dom.list.appendChild(dom.editor);
   }
   
   setTimeout(() => cmEditor.refresh(), 10);
@@ -239,6 +257,7 @@ function closeEditor() {
   dom.btnAdd.style.display = 'block';
   editingId = null;
   isNewSnippet = false;
+  document.querySelectorAll('.snippet-item').forEach(el => el.classList.remove('active'));
 }
 
 let autoSaveTimeout = null;

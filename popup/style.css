@@ -69,8 +69,13 @@ main {
   display: flex;
   align-items: center;
   gap: 10px;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s, border-color 0.2s;
   cursor: grab;
+}
+
+.snippet-item.active {
+  background-color: rgba(13, 224, 140, 0.3); /* Dark bluish highlight */
+  border-bottom: 1px solid var(--primary);
 }
 
 .snippet-item:active {
@@ -182,10 +187,10 @@ input:checked + .slider:before {
 
 /* Editor */
 .editor-container {
-  background-color: var(--panel-bg);
+  background-color: rgba(30, 58, 138, 0.15); /* Dark bluish tint */
   border-radius: 0;
   padding: 16px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--primary);
 }
 
 .editor-container.hidden {
