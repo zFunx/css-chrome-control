@@ -9,7 +9,6 @@ const dom = {
   empty: document.getElementById('empty-state'),
   editor: document.getElementById('editor-container'),
   editorTitle: document.getElementById('editor-title'),
-  nameInput: document.getElementById('snippet-name'),
   codeInput: document.getElementById('snippet-code'),
   charCount: document.getElementById('char-count'),
   btnBack: document.getElementById('btn-back'),
@@ -88,7 +87,7 @@ function render() {
       el.innerHTML = `
         <div class="drag-handle">⋮⋮</div>
         <div class="snippet-content">
-          <h4 class="snippet-name">${snippet.name}</h4>
+          <input type="text" class="snippet-name-input" value="${snippet.name}" maxlength="50" placeholder="Snippet Name">
         </div>
         <div class="snippet-actions">
           <button class="icon-btn edit" title="Edit">
@@ -105,12 +104,31 @@ function render() {
       `;
 
       // Events
+      const nameInputEl = el.querySelector('.snippet-name-input');
+      let nameTimeout;
+      nameInputEl.addEventListener('input', (e) => {
+        clearTimeout(nameTimeout);
+        const newName = e.target.value.trim() || 'Untitled';
+        snippet.name = newName;
+        if (snippet.id === editingId) dom.editorTitle.textContent = newName;
+        
+        nameTimeout = setTimeout(() => {
+          saveSnippets();
+        }, 300);
+      });
+
       el.querySelector('.toggle-cb').addEventListener('change', (e) => {
         snippet.enabled = e.target.checked;
         saveSnippets();
       });
 
-      el.querySelector('.edit').addEventListener('click', () => openEditor(snippet.id));
+      el.querySelector('.edit').addEventListener('click', () => {
+        if (editingId === snippet.id) {
+          closeEditor();
+        } else {
+          openEditor(snippet.id);
+        }
+      });
       
       el.querySelector('.delete').addEventListener('click', () => {
         if (confirm(`Delete snippet "${snippet.name}"?`)) {
@@ -229,8 +247,7 @@ function openEditor(id = null) {
     editingId = id;
     isNewSnippet = false;
     const snippet = snippets.find(s => s.id === id);
-    dom.editorTitle.textContent = 'Edit Snippet';
-    dom.nameInput.value = snippet.name;
+    dom.editorTitle.textContent = snippet.name;
     cmEditor.setValue(snippet.content || '');
     
     const el = document.querySelector(`.snippet-item[data-id="${id}"]`);
@@ -242,7 +259,6 @@ function openEditor(id = null) {
     editingId = Date.now().toString();
     isNewSnippet = true;
     dom.editorTitle.textContent = 'New Snippet';
-    dom.nameInput.value = '';
     cmEditor.setValue('');
     dom.list.appendChild(dom.editor);
   }
@@ -266,18 +282,17 @@ function triggerAutoSave() {
   autoSaveTimeout = setTimeout(async () => {
     if (!editingId) return;
     
-    const name = dom.nameInput.value.trim() || 'Untitled';
     const content = cmEditor ? cmEditor.getValue() : '';
     
     let snippet = snippets.find(s => s.id === editingId);
     let justCreated = false;
     
     if (!snippet) {
-      if (!content.trim() && name === 'Untitled') return; // skip if completely empty
+      if (!content.trim()) return; // skip if completely empty
       
       snippet = {
         id: editingId,
-        name,
+        name: 'Untitled',
         content,
         enabled: true,
         order: snippets.length
@@ -286,7 +301,6 @@ function triggerAutoSave() {
       isNewSnippet = false;
       justCreated = true;
     } else {
-      snippet.name = name;
       snippet.content = content;
     }
     
@@ -295,9 +309,6 @@ function triggerAutoSave() {
     if (justCreated) {
       render();
       if (cmEditor) cmEditor.focus();
-    } else {
-      const nameEl = document.querySelector(`.snippet-item[data-id="${editingId}"] .snippet-name`);
-      if (nameEl) nameEl.textContent = name;
     }
   }, 300);
 }
@@ -315,7 +326,6 @@ function updateCharCount() {
 // Event Listeners
 dom.btnAdd.addEventListener('click', () => openEditor());
 dom.btnBack.addEventListener('click', closeEditor);
-dom.nameInput.addEventListener('input', triggerAutoSave);
 
 dom.btnEnableAll.addEventListener('click', async () => {
   snippets.forEach(s => s.enabled = true);
