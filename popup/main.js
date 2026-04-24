@@ -180,14 +180,7 @@ function initCodeMirror() {
       mode: "css",
       theme: "material-darker",
       lineNumbers: false,
-      lineWrapping: true,
-      extraKeys: {"Ctrl-Space": "autocomplete"}
-    });
-
-    cmEditor.on("inputRead", function(cm, change) {
-      if (!cm.state.completionActive && /[a-zA-Z-]/.test(change.text[0])) {
-        CodeMirror.commands.autocomplete(cm, null, {completeSingle: false});
-      }
+      lineWrapping: true
     });
 
     cmEditor.on("beforeChange", function(cm, change) {
