@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Chrome Control</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>CSS Control</h1>
+    <div class="domain-info" id="current-domain">Loading...</div>
+  </header>
+
+  <main>
+    <div id="snippet-list" class="snippet-list">
+      <!-- Snippets will be injected here -->
+    </div>
+
+    <div class="empty-state" id="empty-state" style="display: none;">
+      <p>No CSS snippets for this domain yet.</p>
+    </div>
+
+    <!-- Editor Form (Hidden by default) -->
+    <div id="editor-container" class="editor-container hidden">
+      <h3 id="editor-title">New Snippet</h3>
+      <input type="text" id="snippet-name" placeholder="Snippet Name (e.g. Dark Mode)" maxlength="50">
+      <div class="textarea-wrapper">
+        <textarea id="snippet-code" placeholder="body { background: #000 !important; }" maxlength="500"></textarea>
+        <div class="char-count" id="char-count">0 / 500</div>
+      </div>
+      <div class="editor-actions">
+        <button id="btn-cancel" class="btn secondary">Cancel</button>
+        <button id="btn-save" class="btn primary">Save Snippet</button>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <button id="btn-add-new" class="btn primary full-width">Add New Snippet</button>
+    <div class="global-actions">
+      <button id="btn-enable-all" class="btn small" title="Enable All">Enable All</button>
+      <button id="btn-disable-all" class="btn small" title="Disable All">Disable All</button>
+      <button id="btn-remove-all" class="btn small danger" title="Remove All">Clear All</button>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>

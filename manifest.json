@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "CSS Chrome Control",
+  "version": "1.0",
+  "description": "Load persistent custom CSS files on a per-domain basis.",
+  "permissions": [
+    "storage",
+    "scripting",
+    "tabs",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup/index.html"
+  }
+}
