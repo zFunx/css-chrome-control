@@ -48,7 +48,7 @@ h1 {
 }
 
 main {
-  padding: 16px;
+  padding: 0;
   flex: 1;
   overflow-y: auto;
   max-height: 300px;
@@ -58,14 +58,14 @@ main {
 .snippet-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 0;
 }
 
 .snippet-item {
   background-color: var(--panel-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  padding: 12px 16px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -183,10 +183,9 @@ input:checked + .slider:before {
 /* Editor */
 .editor-container {
   background-color: var(--panel-bg);
-  border-radius: var(--radius);
+  border-radius: 0;
   padding: 16px;
-  border: 1px solid var(--border);
-  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border);
 }
 
 .editor-container.hidden {
