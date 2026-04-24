@@ -25,15 +25,14 @@
 
     <!-- Editor Form (Hidden by default) -->
     <div id="editor-container" class="editor-container hidden">
-      <h3 id="editor-title">New Snippet</h3>
+      <div class="editor-header" style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+        <button id="btn-back" class="icon-btn" title="Back" style="font-size: 16px;">←</button>
+        <h3 id="editor-title" style="margin: 0;">New Snippet</h3>
+      </div>
       <input type="text" id="snippet-name" placeholder="Snippet Name (e.g. Dark Mode)" maxlength="50">
       <div class="editor-wrapper">
         <textarea id="snippet-code" placeholder="body { background: #000 !important; }"></textarea>
         <div class="char-count" id="char-count">0 / 500</div>
-      </div>
-      <div class="editor-actions">
-        <button id="btn-cancel" class="btn secondary">Cancel</button>
-        <button id="btn-save" class="btn primary">Save Snippet</button>
       </div>
     </div>
   </main>

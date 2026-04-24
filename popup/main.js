@@ -12,8 +12,7 @@ const dom = {
   nameInput: document.getElementById('snippet-name'),
   codeInput: document.getElementById('snippet-code'),
   charCount: document.getElementById('char-count'),
-  btnSave: document.getElementById('btn-save'),
-  btnCancel: document.getElementById('btn-cancel'),
+  btnBack: document.getElementById('btn-back'),
   btnAdd: document.getElementById('btn-add-new'),
   btnEnableAll: document.getElementById('btn-enable-all'),
   btnDisableAll: document.getElementById('btn-disable-all'),
@@ -200,23 +199,31 @@ function initCodeMirror() {
       }
     });
     
-    cmEditor.on("change", updateCharCount);
+    cmEditor.on("change", () => {
+      updateCharCount();
+      triggerAutoSave();
+    });
   }
 }
 
+let isNewSnippet = false;
+
 function openEditor(id = null) {
-  editingId = id;
   dom.editor.classList.remove('hidden');
   dom.btnAdd.style.display = 'none';
   
   if (!cmEditor) initCodeMirror();
   
   if (id) {
+    editingId = id;
+    isNewSnippet = false;
     const snippet = snippets.find(s => s.id === id);
     dom.editorTitle.textContent = 'Edit Snippet';
     dom.nameInput.value = snippet.name;
     cmEditor.setValue(snippet.content || '');
   } else {
+    editingId = Date.now().toString();
+    isNewSnippet = true;
     dom.editorTitle.textContent = 'New Snippet';
     dom.nameInput.value = '';
     cmEditor.setValue('');
@@ -227,9 +234,43 @@ function openEditor(id = null) {
 }
 
 function closeEditor() {
+  // If user typed nothing in a new snippet, it's not saved anyway
   dom.editor.classList.add('hidden');
   dom.btnAdd.style.display = 'block';
   editingId = null;
+  isNewSnippet = false;
+}
+
+let autoSaveTimeout = null;
+function triggerAutoSave() {
+  if (autoSaveTimeout) clearTimeout(autoSaveTimeout);
+  autoSaveTimeout = setTimeout(async () => {
+    if (!editingId) return;
+    
+    const name = dom.nameInput.value.trim() || 'Untitled';
+    const content = cmEditor ? cmEditor.getValue() : '';
+    
+    let snippet = snippets.find(s => s.id === editingId);
+    if (!snippet) {
+      if (!content.trim() && name === 'Untitled') return; // skip if completely empty
+      
+      snippet = {
+        id: editingId,
+        name,
+        content,
+        enabled: true,
+        order: snippets.length
+      };
+      snippets.push(snippet);
+      isNewSnippet = false;
+    } else {
+      snippet.name = name;
+      snippet.content = content;
+    }
+    
+    await saveSnippets();
+    render();
+  }, 300);
 }
 
 function updateCharCount() {
@@ -244,35 +285,8 @@ function updateCharCount() {
 
 // Event Listeners
 dom.btnAdd.addEventListener('click', () => openEditor());
-dom.btnCancel.addEventListener('click', closeEditor);
-
-dom.btnSave.addEventListener('click', async () => {
-  const name = dom.nameInput.value.trim() || 'Untitled';
-  const content = cmEditor ? cmEditor.getValue().trim() : '';
-  
-  if (!content) {
-    alert("CSS content cannot be empty.");
-    return;
-  }
-
-  if (editingId) {
-    const snippet = snippets.find(s => s.id === editingId);
-    snippet.name = name;
-    snippet.content = content;
-  } else {
-    snippets.push({
-      id: Date.now().toString(),
-      name,
-      content,
-      enabled: true,
-      order: snippets.length
-    });
-  }
-  
-  await saveSnippets();
-  closeEditor();
-  render();
-});
+dom.btnBack.addEventListener('click', closeEditor);
+dom.nameInput.addEventListener('input', triggerAutoSave);
 
 dom.btnEnableAll.addEventListener('click', async () => {
   snippets.forEach(s => s.enabled = true);
