@@ -11,6 +11,7 @@ const dom = {
   editorTitle: document.getElementById('editor-title'),
   nameInput: document.getElementById('snippet-name'),
   codeInput: document.getElementById('snippet-code'),
+  highlightingContent: document.getElementById('highlighting-content'),
   charCount: document.getElementById('char-count'),
   btnSave: document.getElementById('btn-save'),
   btnCancel: document.getElementById('btn-cancel'),
@@ -187,6 +188,7 @@ function openEditor(id = null) {
     dom.nameInput.value = '';
     dom.codeInput.value = '';
   }
+  syncPrism();
   updateCharCount();
 }
 
@@ -210,7 +212,38 @@ function updateCharCount() {
 dom.btnAdd.addEventListener('click', () => openEditor());
 dom.btnCancel.addEventListener('click', closeEditor);
 
-dom.codeInput.addEventListener('input', updateCharCount);
+// Editor Sync and Indentation
+function syncPrism() {
+  const text = dom.codeInput.value;
+  if (window.Prism) {
+    dom.highlightingContent.innerHTML = Prism.highlight(text, Prism.languages.css, 'css');
+  } else {
+    dom.highlightingContent.textContent = text;
+  }
+}
+
+dom.codeInput.addEventListener('input', () => {
+  updateCharCount();
+  syncPrism();
+});
+
+dom.codeInput.addEventListener('scroll', () => {
+  const pre = dom.codeInput.nextElementSibling;
+  pre.scrollTop = dom.codeInput.scrollTop;
+  pre.scrollLeft = dom.codeInput.scrollLeft;
+});
+
+dom.codeInput.addEventListener('keydown', function(e) {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const start = this.selectionStart;
+    const end = this.selectionEnd;
+    this.value = this.value.substring(0, start) + '  ' + this.value.substring(end);
+    this.selectionStart = this.selectionEnd = start + 2;
+    updateCharCount();
+    syncPrism();
+  }
+});
 
 dom.btnSave.addEventListener('click', async () => {
   const name = dom.nameInput.value.trim() || 'Untitled';

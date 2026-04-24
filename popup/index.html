@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CSS Chrome Control</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="libs/prism-tomorrow.min.css">
 </head>
 <body>
   <header>
@@ -25,8 +26,9 @@
     <div id="editor-container" class="editor-container hidden">
       <h3 id="editor-title">New Snippet</h3>
       <input type="text" id="snippet-name" placeholder="Snippet Name (e.g. Dark Mode)" maxlength="50">
-      <div class="textarea-wrapper">
-        <textarea id="snippet-code" placeholder="body { background: #000 !important; }" maxlength="500"></textarea>
+      <div class="editor-wrapper">
+        <textarea id="snippet-code" placeholder="body { background: #000 !important; }" spellcheck="false" maxlength="500"></textarea>
+        <pre aria-hidden="true"><code class="language-css" id="highlighting-content"></code></pre>
         <div class="char-count" id="char-count">0 / 500</div>
       </div>
       <div class="editor-actions">
@@ -39,12 +41,14 @@
   <footer>
     <button id="btn-add-new" class="btn primary full-width">Add New Snippet</button>
     <div class="global-actions">
-      <button id="btn-enable-all" class="btn small" title="Enable All">Enable All</button>
-      <button id="btn-disable-all" class="btn small" title="Disable All">Disable All</button>
-      <button id="btn-remove-all" class="btn small danger" title="Remove All">Clear All</button>
+      <button id="btn-enable-all" class="btn small outline" title="Enable All">Enable All</button>
+      <button id="btn-disable-all" class="btn small outline" title="Disable All">Disable All</button>
+      <button id="btn-remove-all" class="btn small danger" title="Remove All">Remove All</button>
     </div>
   </footer>
 
+  <script src="libs/prism.min.js"></script>
+  <script src="libs/prism-css.min.js"></script>
   <script src="main.js"></script>
 </body>
 </html>

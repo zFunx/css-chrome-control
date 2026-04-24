@@ -222,8 +222,58 @@ textarea {
   font-family: monospace;
 }
 
-.textarea-wrapper {
+/* Editor Overlay Styles */
+.editor-wrapper {
   position: relative;
+  height: 150px;
+  margin-bottom: 12px;
+}
+
+#snippet-code, .editor-wrapper pre {
+  margin: 0 !important;
+  padding: 10px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 6px;
+  width: 100%;
+  height: 100%;
+  font-family: monospace, monospace !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+  box-sizing: border-box;
+  overflow-y: auto;
+  white-space: pre-wrap !important;
+  word-wrap: break-word !important;
+}
+
+#snippet-code {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  color: transparent !important;
+  background: transparent !important;
+  caret-color: var(--text-main);
+  resize: none;
+}
+
+#snippet-code:focus {
+  outline: none;
+  border-color: var(--primary) !important;
+}
+
+.editor-wrapper pre {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  background-color: var(--bg-color) !important;
+  pointer-events: none;
+}
+
+.editor-wrapper code {
+  font-family: monospace, monospace !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
 }
 
 .char-count {
@@ -271,6 +321,17 @@ textarea {
 }
 
 .btn.secondary:hover {
+  background-color: var(--border);
+  color: var(--text-main);
+}
+
+.btn.outline {
+  background-color: var(--bg-color);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.btn.outline:hover {
   background-color: var(--border);
   color: var(--text-main);
 }
