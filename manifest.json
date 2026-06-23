@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "CSS Chrome Control",
+  "name": "CSSSwitch",
   "version": "1.0",
-  "description": "Load persistent custom CSS files on a per-domain basis.",
+  "description": "Apply custom CSS snippets to any website. Create, toggle, and preview styles instantly while you type.",
   "permissions": [
     "storage",
     "scripting",
