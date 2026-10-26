@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "CSSSwitch",
-  "version": "1.0",
+  "version": "1.0.0",
   "description": "Apply custom CSS snippets to any website. Create, toggle, and preview styles instantly while you type.",
   "permissions": [
     "storage",

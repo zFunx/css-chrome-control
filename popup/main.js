@@ -347,5 +347,14 @@ dom.btnRemoveAll.addEventListener('click', async () => {
   }
 });
 
+// External Links
+document.addEventListener('click', (e) => {
+  const link = e.target.closest('a[target="_blank"]');
+  if (link && link.href) {
+    e.preventDefault();
+    chrome.tabs.create({ url: link.href });
+  }
+});
+
 // Boot
 document.addEventListener('DOMContentLoaded', init);
